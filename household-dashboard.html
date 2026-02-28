@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home Base — Your Household Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0e0c;
+    --card: #1a1917;
+    --card2: #211f1c;
+    --accent: #e8c97a;
+    --accent2: #c47f5a;
+    --soft: #a09585;
+    --text: #f0ece4;
+    --muted: #5a554d;
+    --green: #7db87a;
+    --red: #c47a7a;
+    --border: #2e2b27;
+    --radius: 16px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 24px;
+  }
+  h1, h2, h3 { font-family: 'Playfair Display', serif; }
+
+  /* Layout */
+  .header {
+    display: flex; align-items: baseline; justify-content: space-between;
+    margin-bottom: 28px;
+  }
+  .header h1 { font-size: 2rem; color: var(--accent); letter-spacing: -0.5px; }
+  .header .date { color: var(--soft); font-size: 0.85rem; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .col-full { grid-column: 1 / -1; }
+
+  /* Cards */
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    padding: 20px;
+    animation: fadeUp 0.4s ease both;
+  }
+  .card:nth-child(2) { animation-delay: 0.05s; }
+  .card:nth-child(3) { animation-delay: 0.1s; }
+  .card:nth-child(4) { animation-delay: 0.15s; }
+  .card:nth-child(5) { animation-delay: 0.2s; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    color: var(--accent);
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title .icon { font-size: 1rem; }
+
+  /* Progress bar */
+  .progress-wrap { margin-bottom: 14px; }
+  .progress-label { display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--soft); margin-bottom: 5px; }
+  .progress-bar { height: 5px; background: var(--border); border-radius: 99px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent)); border-radius: 99px; transition: width 0.4s ease; }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+  .tab {
+    background: var(--card2); border: 1px solid var(--border);
+    color: var(--soft); padding: 5px 12px; border-radius: 99px;
+    font-size: 0.78rem; cursor: pointer; transition: all 0.2s;
+  }
+  .tab.active, .tab:hover { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+
+  /* Chores */
+  .chore-list { display: flex; flex-direction: column; gap: 8px; }
+  .chore-item {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--card2); border-radius: 10px;
+    padding: 10px 12px; border: 1px solid transparent;
+    cursor: pointer; transition: all 0.2s; user-select: none;
+  }
+  .chore-item:hover { border-color: var(--border); }
+  .chore-item.done { opacity: 0.45; }
+  .chore-item.done .chore-name { text-decoration: line-through; }
+  .chore-check {
+    width: 18px; height: 18px; border-radius: 5px;
+    border: 2px solid var(--muted); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.65rem; transition: all 0.2s;
+  }
+  .chore-item.done .chore-check { background: var(--green); border-color: var(--green); color: #fff; }
+  .chore-name { font-size: 0.85rem; flex: 1; }
+  .chore-badge {
+    font-size: 0.68rem; padding: 2px 7px; border-radius: 99px;
+    background: var(--card); color: var(--soft);
+  }
+  .chore-badge.today { background: #3a2e1a; color: var(--accent); }
+  .chore-badge.overdue { background: #2e1a1a; color: var(--red); }
+
+  /* Add form */
+  .add-row { display: flex; gap: 8px; margin-top: 12px; }
+  .add-input {
+    flex: 1; background: var(--card2); border: 1px solid var(--border);
+    color: var(--text); border-radius: 8px; padding: 8px 12px;
+    font-size: 0.83rem; font-family: 'DM Sans', sans-serif;
+    outline: none; transition: border-color 0.2s;
+  }
+  .add-input:focus { border-color: var(--accent); }
+  .add-input::placeholder { color: var(--muted); }
+  .btn {
+    background: var(--accent); color: var(--bg); border: none;
+    border-radius: 8px; padding: 8px 14px; font-size: 0.82rem;
+    font-weight: 500; cursor: pointer; transition: opacity 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .btn:hover { opacity: 0.85; }
+  .btn.ghost {
+    background: transparent; border: 1px solid var(--border);
+    color: var(--soft);
+  }
+  .btn.ghost:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  /* Shopping */
+  .shop-list { display: flex; flex-direction: column; gap: 7px; max-height: 260px; overflow-y: auto; }
+  .shop-item {
+    display: flex; align-items: center; gap: 9px;
+    font-size: 0.83rem; padding: 8px 10px;
+    background: var(--card2); border-radius: 9px;
+    border: 1px solid transparent; transition: all 0.2s;
+  }
+  .shop-item.bought { opacity: 0.4; }
+  .shop-item.bought .shop-name { text-decoration: line-through; }
+  .shop-check { width: 16px; height: 16px; border-radius: 4px; border: 2px solid var(--muted); flex-shrink: 0; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; }
+  .shop-item.bought .shop-check { background: var(--green); border-color: var(--green); color: #fff; }
+  .shop-name { flex: 1; }
+  .shop-cat { font-size: 0.68rem; color: var(--muted); }
+  .shop-del { color: var(--muted); cursor: pointer; font-size: 0.75rem; transition: color 0.2s; }
+  .shop-del:hover { color: var(--red); }
+
+  /* Inventory */
+  .inv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .inv-item { background: var(--card2); border-radius: 10px; padding: 10px 12px; border: 1px solid var(--border); }
+  .inv-name { font-size: 0.82rem; margin-bottom: 4px; }
+  .inv-status { font-size: 0.73rem; }
+  .inv-status.ok { color: var(--green); }
+  .inv-status.low { color: var(--accent); }
+  .inv-status.out { color: var(--red); }
+
+  /* To-do (one-time) */
+  .todo-list { display: flex; flex-direction: column; gap: 7px; max-height: 220px; overflow-y: auto; }
+  .todo-item {
+    display: flex; align-items: flex-start; gap: 9px;
+    background: var(--card2); border-radius: 9px;
+    padding: 9px 12px; font-size: 0.83rem; cursor: pointer;
+    border: 1px solid transparent; transition: all 0.2s;
+  }
+  .todo-item:hover { border-color: var(--border); }
+  .todo-item.done { opacity: 0.4; }
+  .todo-item.done .todo-text { text-decoration: line-through; }
+  .todo-check { width: 17px; height: 17px; border-radius: 5px; border: 2px solid var(--muted); flex-shrink: 0; margin-top: 1px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; }
+  .todo-item.done .todo-check { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+  .todo-text { flex: 1; line-height: 1.4; }
+  .todo-pri { font-size: 0.68rem; padding: 1px 6px; border-radius: 99px; margin-top: 1px; flex-shrink: 0; }
+  .todo-pri.high { background: #2e1a1a; color: var(--red); }
+  .todo-pri.med { background: #2e2a1a; color: var(--accent); }
+  .todo-pri.low { background: #1a2a1a; color: var(--green); }
+
+  /* Stats strip */
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .stat { text-align: center; padding: 12px; background: var(--card2); border-radius: 12px; border: 1px solid var(--border); }
+  .stat-num { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--accent); line-height: 1; }
+  .stat-label { font-size: 0.73rem; color: var(--soft); margin-top: 3px; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+  @media (max-width: 600px) {
+    .grid { grid-template-columns: 1fr; }
+    .col-full { grid-column: 1; }
+    body { padding: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🏠 Home Base</h1>
+  <span class="date" id="dateStr"></span>
+</div>
+
+<!-- Stats strip -->
+<div class="card col-full" style="margin-bottom:16px;">
+  <div class="stats" id="statsStrip">
+    <div class="stat"><div class="stat-num" id="statDone">0</div><div class="stat-label">Chores Done Today</div></div>
+    <div class="stat"><div class="stat-num" id="statShop">0</div><div class="stat-label">Items to Buy</div></div>
+    <div class="stat"><div class="stat-num" id="statTodo">0</div><div class="stat-label">Tasks Pending</div></div>
+  </div>
+</div>
+
+<div class="grid">
+
+  <!-- CHORES -->
+  <div class="card">
+    <div class="card-title"><span class="icon">🧹</span> Recurring Chores</div>
+    <div class="tabs" id="choreTabs">
+      <div class="tab active" onclick="filterChores('all',this)">All</div>
+      <div class="tab" onclick="filterChores('daily',this)">Daily</div>
+      <div class="tab" onclick="filterChores('weekly',this)">Weekly</div>
+      <div class="tab" onclick="filterChores('monthly',this)">Monthly</div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-label"><span>Today's progress</span><span id="choresProgress">0%</span></div>
+      <div class="progress-bar"><div class="progress-fill" id="choresBar" style="width:0%"></div></div>
+    </div>
+    <div class="chore-list" id="choreList"></div>
+    <div class="add-row">
+      <input class="add-input" id="choreInput" placeholder="Add chore…" onkeydown="if(event.key==='Enter')addChore()">
+      <select class="add-input" id="choreFreq" style="flex:0;width:90px;">
+        <option value="daily">Daily</option>
+        <option value="weekly">Weekly</option>
+        <option value="monthly">Monthly</option>
+      </select>
+      <button class="btn" onclick="addChore()">+</button>
+    </div>
+  </div>
+
+  <!-- TO-DO -->
+  <div class="card">
+    <div class="card-title"><span class="icon">📋</span> One-Time Tasks</div>
+    <div class="todo-list" id="todoList"></div>
+    <div class="add-row">
+      <input class="add-input" id="todoInput" placeholder="Add task…" onkeydown="if(event.key==='Enter')addTodo()">
+      <select class="add-input" id="todoPri" style="flex:0;width:80px;">
+        <option value="high">High</option>
+        <option value="med">Med</option>
+        <option value="low">Low</option>
+      </select>
+      <button class="btn" onclick="addTodo()">+</button>
+    </div>
+  </div>
+
+  <!-- SHOPPING LIST -->
+  <div class="card">
+    <div class="card-title"><span class="icon">🛒</span> Shopping List</div>
+    <div class="shop-list" id="shopList"></div>
+    <div class="add-row">
+      <input class="add-input" id="shopInput" placeholder="Add item…" onkeydown="if(event.key==='Enter')addShopItem()">
+      <input class="add-input" id="shopCat" placeholder="Category" style="flex:0;width:90px;" onkeydown="if(event.key==='Enter')addShopItem()">
+      <button class="btn" onclick="addShopItem()">+</button>
+    </div>
+  </div>
+
+  <!-- INVENTORY -->
+  <div class="card">
+    <div class="card-title"><span class="icon">📦</span> Home Inventory</div>
+    <div class="inv-grid" id="invGrid"></div>
+    <div class="add-row" style="margin-top:12px;">
+      <input class="add-input" id="invName" placeholder="Item name…" onkeydown="if(event.key==='Enter')addInvItem()">
+      <select class="add-input" id="invLevel" style="flex:0;width:80px;">
+        <option value="ok">Full</option>
+        <option value="low">Low</option>
+        <option value="out">Out</option>
+      </select>
+      <button class="btn" onclick="addInvItem()">+</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ---- STATE ----
+let state = JSON.parse(localStorage.getItem('homebase') || 'null') || {
+  chores: [
+    {id:1, name:"Make bed", freq:"daily", done:false},
+    {id:2, name:"Wash dishes", freq:"daily", done:false},
+    {id:3, name:"Wipe counters", freq:"daily", done:false},
+    {id:4, name:"Vacuum", freq:"weekly", done:false},
+    {id:5, name:"Mop floors", freq:"weekly", done:false},
+    {id:6, name:"Clean bathroom", freq:"weekly", done:false},
+    {id:7, name:"Change bed sheets", freq:"weekly", done:false},
+    {id:8, name:"Clean oven", freq:"monthly", done:false},
+    {id:9, name:"Dust shelves", freq:"monthly", done:false},
+  ],
+  shopping: [
+    {id:1, name:"Milk", cat:"Dairy", bought:false},
+    {id:2, name:"Bread", cat:"Pantry", bought:false},
+    {id:3, name:"Dish soap", cat:"Cleaning", bought:false},
+  ],
+  inventory: [
+    {id:1, name:"Toilet paper", level:"ok"},
+    {id:2, name:"Laundry detergent", level:"low"},
+    {id:3, name:"Dish soap", level:"ok"},
+    {id:4, name:"Paper towels", level:"out"},
+    {id:5, name:"Trash bags", level:"ok"},
+    {id:6, name:"Sponges", level:"low"},
+  ],
+  todos: [
+    {id:1, text:"Call plumber about leak", pri:"high", done:false},
+    {id:2, text:"Buy new lightbulb for kitchen", pri:"med", done:false},
+    {id:3, text:"Organize hall closet", pri:"low", done:false},
+  ]
+};
+let choreFilter = 'all';
+let nextId = 100;
+
+function save() { localStorage.setItem('homebase', JSON.stringify(state)); }
+
+// ---- DATE ----
+document.getElementById('dateStr').textContent = new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+
+// ---- CHORES ----
+function renderChores() {
+  const list = document.getElementById('choreList');
+  const filtered = choreFilter === 'all' ? state.chores : state.chores.filter(c => c.freq === choreFilter);
+  const todayChores = state.chores.filter(c => c.freq === 'daily');
+  const doneTodayCount = todayChores.filter(c => c.done).length;
+  const pct = todayChores.length ? Math.round(doneTodayCount / todayChores.length * 100) : 0;
+  document.getElementById('choresProgress').textContent = pct + '%';
+  document.getElementById('choresBar').style.width = pct + '%';
+  document.getElementById('statDone').textContent = state.chores.filter(c=>c.done).length;
+
+  list.innerHTML = filtered.map(c => `
+    <div class="chore-item ${c.done?'done':''}" onclick="toggleChore(${c.id})">
+      <div class="chore-check">${c.done?'✓':''}</div>
+      <div class="chore-name">${c.name}</div>
+      <div class="chore-badge ${c.freq==='daily'?'today':''}">${c.freq}</div>
+    </div>
+  `).join('');
+  updateStats();
+}
+
+function toggleChore(id) {
+  const c = state.chores.find(x=>x.id===id);
+  if(c) { c.done = !c.done; save(); renderChores(); }
+}
+
+function filterChores(f, el) {
+  choreFilter = f;
+  document.querySelectorAll('#choreTabs .tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  renderChores();
+}
+
+function addChore() {
+  const inp = document.getElementById('choreInput');
+  const freq = document.getElementById('choreFreq').value;
+  if(!inp.value.trim()) return;
+  state.chores.push({id:nextId++, name:inp.value.trim(), freq, done:false});
+  inp.value = '';
+  save(); renderChores();
+}
+
+// ---- SHOPPING ----
+function renderShopping() {
+  const list = document.getElementById('shopList');
+  document.getElementById('statShop').textContent = state.shopping.filter(s=>!s.bought).length;
+  list.innerHTML = state.shopping.map(s => `
+    <div class="shop-item ${s.bought?'bought':''}">
+      <div class="shop-check" onclick="toggleShop(${s.id})">${s.bought?'✓':''}</div>
+      <div class="shop-name">${s.name}</div>
+      <div class="shop-cat">${s.cat||''}</div>
+      <div class="shop-del" onclick="deleteShop(${s.id})">✕</div>
+    </div>
+  `).join('');
+}
+
+function toggleShop(id) {
+  const s = state.shopping.find(x=>x.id===id);
+  if(s) { s.bought = !s.bought; save(); renderShopping(); updateStats(); }
+}
+function deleteShop(id) {
+  state.shopping = state.shopping.filter(x=>x.id!==id);
+  save(); renderShopping(); updateStats();
+}
+function addShopItem() {
+  const inp = document.getElementById('shopInput');
+  const cat = document.getElementById('shopCat').value.trim();
+  if(!inp.value.trim()) return;
+  state.shopping.push({id:nextId++, name:inp.value.trim(), cat, bought:false});
+  inp.value = ''; document.getElementById('shopCat').value = '';
+  save(); renderShopping(); updateStats();
+}
+
+// ---- INVENTORY ----
+function renderInventory() {
+  const grid = document.getElementById('invGrid');
+  const labels = {ok:'Well stocked', low:'Running low', out:'Out — restock!'};
+  grid.innerHTML = state.inventory.map(item => `
+    <div class="inv-item">
+      <div class="inv-name">${item.name}</div>
+      <div class="inv-status ${item.level}">${labels[item.level]}</div>
+      <div style="margin-top:6px;display:flex;gap:4px;">
+        ${['ok','low','out'].map(l=>`<div onclick="setInvLevel(${item.id},'${l}')" style="flex:1;height:4px;border-radius:99px;background:${item.level===l?(l==='ok'?'var(--green)':l==='low'?'var(--accent)':'var(--red)'):'var(--border)'};cursor:pointer;"></div>`).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+function setInvLevel(id, level) {
+  const item = state.inventory.find(x=>x.id===id);
+  if(item) { item.level = level; save(); renderInventory(); }
+}
+function addInvItem() {
+  const inp = document.getElementById('invName');
+  const level = document.getElementById('invLevel').value;
+  if(!inp.value.trim()) return;
+  state.inventory.push({id:nextId++, name:inp.value.trim(), level});
+  inp.value = '';
+  save(); renderInventory();
+}
+
+// ---- TODOS ----
+function renderTodos() {
+  const list = document.getElementById('todoList');
+  document.getElementById('statTodo').textContent = state.todos.filter(t=>!t.done).length;
+  list.innerHTML = state.todos.map(t => `
+    <div class="todo-item ${t.done?'done':''}" onclick="toggleTodo(${t.id})">
+      <div class="todo-check">${t.done?'✓':''}</div>
+      <div class="todo-text">${t.text}</div>
+      <div class="todo-pri ${t.pri}">${t.pri}</div>
+    </div>
+  `).join('');
+}
+function toggleTodo(id) {
+  const t = state.todos.find(x=>x.id===id);
+  if(t) { t.done = !t.done; save(); renderTodos(); updateStats(); }
+}
+function addTodo() {
+  const inp = document.getElementById('todoInput');
+  const pri = document.getElementById('todoPri').value;
+  if(!inp.value.trim()) return;
+  state.todos.push({id:nextId++, text:inp.value.trim(), pri, done:false});
+  inp.value = '';
+  save(); renderTodos(); updateStats();
+}
+
+function updateStats() {
+  document.getElementById('statDone').textContent = state.chores.filter(c=>c.done).length;
+  document.getElementById('statShop').textContent = state.shopping.filter(s=>!s.bought).length;
+  document.getElementById('statTodo').textContent = state.todos.filter(t=>!t.done).length;
+}
+
+// ---- INIT ----
+renderChores();
+renderShopping();
+renderInventory();
+renderTodos();
+</script>
+</body>
+</html>

@@ -65,49 +65,6 @@
  }
  .card-title .icon { font-size: 1rem; }
 
- /* Apps strip */
- .apps-strip {
-  margin-bottom: 16px;
-  background: var(--card);
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  padding: 16px 20px;
-  animation: fadeUp 0.4s ease both;
- }
- .apps-strip-title {
-  font-size: 0.72rem;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-bottom: 12px;
- }
- .apps-row {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
- }
- .app-tile {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  background: var(--card2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 10px 16px;
-  text-decoration: none;
-  color: var(--text);
-  font-size: 0.85rem;
-  font-weight: 500;
-  transition: all 0.2s;
-  cursor: pointer;
- }
- .app-tile:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-  background: #211f1c;
- }
- .app-tile .app-icon { font-size: 1.15rem; }
- .app-tile .app-label { font-family: 'DM Sans', sans-serif; }
 
  /* Progress bar */
  .progress-wrap { margin-bottom: 14px; }
@@ -242,16 +199,6 @@
  <span class="date" id="dateStr"></span>
 </div>
 
-<!-- My Apps -->
-<div class="apps-strip">
- <div class="apps-strip-title">My Apps</div>
- <div class="apps-row">
-  <a class="app-tile" href="/filament.html">
-   <span class="app-icon">ð§µ</span>
-   <span class="app-label">Filament Inventory</span>
-  </a>
- </div>
-</div>
 
 <!-- Stats strip -->
 <div class="card col-full" style="margin-bottom:16px;">
